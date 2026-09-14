@@ -11,4 +11,4 @@ db_url=os.getenv("DATBASE_URL")
 
 engine=create_engine(os.getenv("DATBASE_URL"))
 SessionLocal=sessionmaker(bind=engine)
-base=declarative_base()
+Base=declarative_base()
