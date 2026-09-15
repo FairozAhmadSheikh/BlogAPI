@@ -42,3 +42,15 @@ def get_all_blogs(db:Session=Depends(get_db)):
             detail="No blog Found"
         )
     return all_blogs
+
+# Get on the basis of id
+@app.get("/blog/{id}",response_model=schemas.BlogResponse)
+def get_blog_id(id:int,db:Session=Depends(get_db)):
+    blog=db.query(models.Blog).filter(models.Blog.id==id).first()
+    if not blog:
+        raise HTTPException(
+            status_code=404,
+            detail="Blog not found"
+        )
+    return blog
+
