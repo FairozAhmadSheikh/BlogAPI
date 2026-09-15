@@ -31,3 +31,14 @@ def create_blog(blog:schemas.BlogCreate,db:Session=Depends(get_db)):
     db.commit()
     db.refresh(new_blog)
     return new_blog
+
+# Get all blogs
+@app.get("/get_blogs",response_model=list[schemas.BlogResponse])
+def get_all_blogs(db:Session=Depends(get_db)):
+    all_blogs=db.query(models.Blog).all()
+    if not all_blogs:
+        raise HTTPException(
+            status_code=404,
+            detail="No blog Found"
+        )
+    return all_blogs
