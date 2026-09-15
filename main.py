@@ -54,3 +54,20 @@ def get_blog_id(id:int,db:Session=Depends(get_db)):
         )
     return blog
 
+# Update on the basis of id 
+@app.put("/blog/{id}",response_model=schemas.BlogResponse)
+def update_blog(id:int,blog:schemas.BlogCreate,db:Session=Depends(get_db)):
+    existing_blog=db.query(models.Blog).filter(models.Blog.id==id).first()
+
+    if not blog :
+        raise HTTPException(
+            status_code=404,
+            detail="Blog not Found"
+        )
+    existing_blog.title=blog.title
+    existing_blog.content=blog.content
+
+    db.commit()
+    
+    return existing_blog
+
