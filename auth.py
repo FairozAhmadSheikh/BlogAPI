@@ -17,3 +17,9 @@ def create_token(data:dict):
     to_encode.update({'exp':expire})
     return jwt.encode(to_encode,SECRET_KEY,algorithm=ALGORITHM)
 
+def verify_token(token:str=Depends(oauth_schema)):
+    try:
+        payload=jwt.decode(token,SECRET_KEY,algorithms=ALGORITHM)
+        return payload
+    except JWTError:
+        raise HTTPException(status_code=401,detail="Invalid token")

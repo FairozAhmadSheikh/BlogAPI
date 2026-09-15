@@ -2,6 +2,7 @@ from fastapi import FastAPI,Depends,HTTPException
 import models,schemas
 from database import engine,SessionLocal
 from sqlalchemy.orm import Session
+from auth import create_token,verify_token
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -21,6 +22,14 @@ def get_db():
 def home():
     return{
         "message":"Workig "
+    }
+
+#Login
+@app.get("/login")
+def login():
+    return{
+        "access_token":create_token({"user":"admin"}),
+        "token_type":"bearer"
     }
 
 # Create blog
