@@ -6,7 +6,7 @@ import os
 
 SECRET_KEY=os.getenv("SECRET_KEY")
 ALGORITHM=os.getenv("ALGORITHM")
-ACCESS_TOKEN_EXPIRY_MINUTES=os.getenv("ACCESS_TOKEN_EXPIRY")
+ACCESS_TOKEN_EXPIRY_MINUTES=int(os.getenv("ACCESS_TOKEN_EXPIRY_MINUTES"))
 
 oauth_schema=OAuth2PasswordBearer(tokenUrl="login")
 
@@ -19,7 +19,7 @@ def create_token(data:dict):
 
 def verify_token(token:str=Depends(oauth_schema)):
     try:
-        payload=jwt.decode(token,SECRET_KEY,algorithms=ALGORITHM)
+        payload=jwt.decode(token,SECRET_KEY,algorithms=[ALGORITHM])
         return payload
     except JWTError:
         raise HTTPException(status_code=401,detail="Invalid token")

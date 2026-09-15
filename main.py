@@ -16,7 +16,13 @@ def get_db():
         yield db
     finally:
         db.close()
-
+#Login
+@app.post("/login")
+def login():
+    return{
+        "access_token":create_token({"user":"admin"}),
+        "token_type":"bearer"
+    }
 
 @app.get("/")
 def home():
@@ -24,17 +30,11 @@ def home():
         "message":"Workig "
     }
 
-#Login
-@app.get("/login")
-def login():
-    return{
-        "access_token":create_token({"user":"admin"}),
-        "token_type":"bearer"
-    }
+
 
 # Create blog
 @app.post("/blogs",response_model=schemas.BlogResponse)
-def create_blog(blog:schemas.BlogCreate,db:Session=Depends(get_db)):
+def create_blog(blog:schemas.BlogCreate,user=Depends(verify_token),db:Session=Depends(get_db)):
     new_blog=models.Blog(title=blog.title,content=blog.content)
     db.add(new_blog)
     db.commit()
@@ -54,7 +54,7 @@ def get_all_blogs(db:Session=Depends(get_db)):
 
 # Get on the basis of id
 @app.get("/blog/{id}",response_model=schemas.BlogResponse)
-def get_blog_id(id:int,db:Session=Depends(get_db)):
+def get_blog_id(id:int,user=Depends(verify_token),db:Session=Depends(get_db)):
     blog=db.query(models.Blog).filter(models.Blog.id==id).first()
     if not blog:
         raise HTTPException(
@@ -65,7 +65,7 @@ def get_blog_id(id:int,db:Session=Depends(get_db)):
 
 # Update on the basis of id 
 @app.put("/blog/{id}",response_model=schemas.BlogResponse)
-def update_blog(id:int,blog:schemas.BlogCreate,db:Session=Depends(get_db)):
+def update_blog(id:int,blog:schemas.BlogCreate,db:Session=Depends(get_db),user=Depends(verify_token)):
     existing_blog=db.query(models.Blog).filter(models.Blog.id==id).first()
 
     if not blog :
@@ -83,7 +83,7 @@ def update_blog(id:int,blog:schemas.BlogCreate,db:Session=Depends(get_db)):
 # Delete on the basis of id 
 
 @app.delete("/blog/{id}")
-def delete_blog(id:int,db:Session=Depends(get_db)):
+def delete_blog(id:int,db:Session=Depends(get_db),user=Depends(verify_token)):
     blog=db.query(models.Blog).filter(models.Blog.id==id).first()
 
     if not blog:
